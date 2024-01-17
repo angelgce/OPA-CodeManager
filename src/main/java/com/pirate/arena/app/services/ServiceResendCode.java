@@ -27,6 +27,7 @@ public class ServiceResendCode {
 
     public String resendCode(Request user) {
         //validate email
+        validateInputs(user);
         Table table = dynamoDB.getTable("users");
         Item item = table.getItem("email", user.email());
         if (item == null)
@@ -35,7 +36,6 @@ public class ServiceResendCode {
             throw new BadRequestException("Error: user is already verified.");
         //update code
         String code = serviceCreateCode.getCode();
-
         UpdateItemSpec updateItemSpec = new UpdateItemSpec()
                 .withPrimaryKey("email", user.email())
                 .withUpdateExpression("set code = :code")
@@ -43,12 +43,17 @@ public class ServiceResendCode {
                         .withString(":code", code));
         int response = (table.updateItem(updateItemSpec)
                 .getUpdateItemResult().getSdkHttpMetadata().getHttpStatusCode());
-        if(response != 200)
+        if (response != 200)
             throw new BadRequestException("Error: code not updated.");
         //send email
-        serviceMail.sendWelcomeMail(user,code);
+        serviceMail.sendWelcomeMail(user, code);
         return "Code sent!";
     }
 
+    private void validateInputs(Request request) {
+        if (request.email() == null || request.username() == null)
+            throw new BadRequestException("Error in the request, some mandatory fields are missing "
+                    .concat(request.toString()));
+    }
 
 }

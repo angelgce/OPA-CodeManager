@@ -1,7 +1,6 @@
 package com.pirate.arena.app.services;
 
 import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
-import com.pirate.arena.app.exceptions.BadRequestException;
 import com.pirate.arena.app.models.Request;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,16 +51,5 @@ public class ServiceMail {
             throw new InternalServerErrorException("Error: " + ex.getMessage());
         }
     }
-//
-//    private void validateInputs(Request user) {
-//        if (user.email() == null || user.username() == null)
-//            throw new BadRequestException("Error: Some fields are missing... " + user);
-//        if (user.username().length() > 12 || user.username().length() < 6)
-//            throw new BadRequestException("Error: Username must be between 6 and 12 characters long...");
-//        else if (!user.username().matches("^[a-zA-Z0-9]*$"))
-//            throw new BadRequestException("Error: Username must contain only letters and numbers...");
-//        else if (!user.email().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"))
-//            throw new BadRequestException("Error: Invalid email...");
-//    }
 
 }

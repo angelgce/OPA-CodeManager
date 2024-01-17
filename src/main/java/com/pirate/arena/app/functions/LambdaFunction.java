@@ -1,7 +1,6 @@
 package com.pirate.arena.app.functions;
 
 import com.pirate.arena.app.models.Request;
-import com.pirate.arena.app.services.ServiceCreateUser;
 import com.pirate.arena.app.services.ServiceResendCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
