@@ -7,10 +7,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
-import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import com.pirate.arena.app.exceptions.BadRequestException;
 import com.pirate.arena.app.models.Request;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +49,7 @@ public class ServiceResendCode {
     }
 
     private void validateInputs(Request request) {
-        if (request.email() == null || request.username() == null)
+        if (request.email() == null)
             throw new BadRequestException("Error in the request, some mandatory fields are missing "
                     .concat(request.toString()));
     }

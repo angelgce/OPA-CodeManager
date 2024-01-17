@@ -12,7 +12,7 @@
     <artifactId>resendCode</artifactId>
     <version>1.0.0</version>
     <name>resendCode</name>
-    <description>Create User service</description>
+    <description>Resend code service</description>
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2021.0.8</spring-cloud.version>
