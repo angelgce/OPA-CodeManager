@@ -4,16 +4,19 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.pirate.arena.app.dynamoDB.ServiceDynamoDB;
 import com.pirate.arena.app.exceptions.BadRequestException;
 import com.pirate.arena.app.requests.RequestConfirmCode;
+import com.pirate.arena.app.requests.RequestCreateCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ServiceCode implements IServiceCode {
+public class ServiceCode extends ServiceValidateRequest implements IServiceCode {
     private final ServiceDynamoDB serviceDynamoDB;
 
     @Override
@@ -26,19 +29,34 @@ public class ServiceCode implements IServiceCode {
     }
 
     @Override
-    public String createUserCode() {
-        return null;
+    public String createUserCode(RequestCreateCode createCode) {
+        validateInputs(Optional.ofNullable(createCode));
+        List<Item> list = serviceDynamoDB.getItemByIndex("codes", "email", createCode.email(), "email-index");
+        list.forEach(item -> {
+            String type = (String) item.get("type");
+            if (type.equals(createCode.type()))
+                throw new BadRequestException("The user [".concat(createCode.email()).concat("] already has a code for ["
+                        .concat(createCode.type()).concat("]")));
+        });
+        //update...
+        String code = createCode();
+        Item item = new Item()
+                .withPrimaryKey("code", code)
+                .withString("email", createCode.email())
+                .withString("type", createCode.type());
+        serviceDynamoDB.putItem("codes",item);
+        return code;
     }
 
     @Override
     public String confirmCode(RequestConfirmCode confirmCode) {
-        validateInputs(confirmCode);
+        validateInputs(Optional.ofNullable(confirmCode));
         Item item = serviceDynamoDB.getItemByKey("codes", "code", confirmCode.code());
         if (!isCodeMatch((String) item.get("email"), confirmCode.email())
             || !isCodeMatch((String) item.get("code"), confirmCode.code()))
-            throw new BadRequestException("Error: invalid code");
+            throw new BadRequestException("Error: Invalid code [".concat(confirmCode.toString()).concat("]"));
         serviceDynamoDB.deleteItem("codes", "code", confirmCode.code());
-        log.info("user {} validated an code. {}", confirmCode.email(), item.toJSONPretty());
+        log.info("Code Validated {}", confirmCode.email(), item);
         return "success";
     }
 
@@ -47,11 +65,6 @@ public class ServiceCode implements IServiceCode {
         return expect.equals(actual);
     }
 
-    @Override
-    public void validateInputs(RequestConfirmCode confirmCode) {
-        if (confirmCode.toString().contains("null"))
-            throw new BadRequestException("Error in the requests, some mandatory fields are missing "
-                    .concat(confirmCode.toString()));
-    }
+
 }
 

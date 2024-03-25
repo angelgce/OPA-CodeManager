@@ -48,11 +48,9 @@ public class ServiceDynamoDB implements IServiceDynamoDB {
         ItemCollection<QueryOutcome> items = table.getIndex(indexKey).query(spec);
         List<Item> itemList = new ArrayList<>();
         items.iterator().forEachRemaining(itemList::add);
-        if (itemList.isEmpty())
-            throw new BadRequestException("Error: index [".concat(indexKey).concat("] doesn't exists"
-                    .concat("or doesn't has values")));
         return itemList;
     }
+
 
     @Override
     public int updateItem(String tableName, String primaryKey, String primaryKeyValue, String key, String value) {
