@@ -1,7 +1,7 @@
 package com.pirate.arena.app.services;
 
 import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
-import com.pirate.arena.app.models.Request;
+import com.pirate.arena.app.requests.RequestSendMail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +29,13 @@ public class ServiceMail {
         return body.toString();
     }
 
-    public void sendWelcomeMail(Request user, String code) {
+    public void sendWelcomeMail(RequestSendMail user, String code) {
         try {
             AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
                     .withRegion(Regions.US_EAST_1).build();
             SendEmailRequest request = new SendEmailRequest()
                     .withDestination(
-                            new Destination().withToAddresses(user.email()))
+                            new Destination().withToAddresses(user.emailReceiver()))
                     .withMessage(new Message()
                             .withBody(new Body()
                                     .withHtml(new Content()
