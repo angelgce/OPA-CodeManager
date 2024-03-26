@@ -38,13 +38,13 @@ public class ServiceCode extends ServiceValidateRequest implements IServiceCode 
                 throw new BadRequestException("The user [".concat(createCode.email()).concat("] already has a code for ["
                         .concat(createCode.type()).concat("]")));
         });
-        //update...
         String code = createCode();
         Item item = new Item()
                 .withPrimaryKey("code", code)
                 .withString("email", createCode.email())
                 .withString("type", createCode.type());
         serviceDynamoDB.putItem("codes",item);
+        log.info("[Code added] request:[{}] code:[{}]", createCode,code);
         return code;
     }
 
@@ -56,7 +56,7 @@ public class ServiceCode extends ServiceValidateRequest implements IServiceCode 
             || !isCodeMatch((String) item.get("code"), confirmCode.code()))
             throw new BadRequestException("Error: Invalid code [".concat(confirmCode.toString()).concat("]"));
         serviceDynamoDB.deleteItem("codes", "code", confirmCode.code());
-        log.info("Code Validated {}", confirmCode.email(), item);
+        log.info("[Code validated] request:[{}] code:[{}]", confirmCode,item);
         return "success";
     }
 

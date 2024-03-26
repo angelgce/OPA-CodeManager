@@ -20,21 +20,21 @@ public class LambdaFunction {
     private final ServiceCode serviceCode;
     private final ServiceSendMail serviceSendMail;
 
-    //Function to send a mail to an user
+    //Send a mail to a user
     @Bean
     public Function<RequestSendMail, ResponseEntity<Map<String, String>>> sendEmail() {
         return value -> ResponseEntity.ok()
                 .body(Collections.singletonMap("data", serviceSendMail.sendMail(value)));
     }
 
-    //Function to confirm a code
+    //Confirm a code
     @Bean
     public Function<RequestConfirmCode, ResponseEntity<Map<String, String>>> confirmCode() {
         return value -> ResponseEntity.ok()
                 .body(Collections.singletonMap("data", serviceCode.confirmCode(value)));
     }
 
-    //function to create a code for user
+    //Create a code for user
     @Bean
     public Function<RequestCreateCode, ResponseEntity<Map<String, String>>> createCode() {
         return value -> ResponseEntity.ok()

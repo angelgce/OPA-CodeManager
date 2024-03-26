@@ -9,12 +9,14 @@ import com.amazonaws.services.simpleemail.model.*;
 import com.pirate.arena.app.requests.RequestCreateCode;
 import com.pirate.arena.app.requests.RequestSendMail;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ServiceSendMail extends ServiceValidateRequest implements IServiceSendMail {
 
     private final ServiceCode serviceCode;
@@ -22,6 +24,7 @@ public class ServiceSendMail extends ServiceValidateRequest implements IServiceS
     @Override
     public String sendMail(RequestSendMail requestSendMail) {
         validateInputs(Optional.ofNullable(requestSendMail));
+        String message = htmlMail(requestSendMail);
         try {
             AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
                     .withRegion(Regions.US_EAST_1).build();
@@ -31,8 +34,7 @@ public class ServiceSendMail extends ServiceValidateRequest implements IServiceS
                     .withMessage(new Message()
                             .withBody(new Body()
                                     .withHtml(new Content()
-                                            .withCharset("UTF-8").withData(
-                                                    htmlMail(requestSendMail))))
+                                            .withCharset("UTF-8").withData(message)))
                             .withSubject(new Content()
                                     .withCharset("UTF-8").withData(requestSendMail.subject())))
                     .withSource("no-replay@onepiece-arena.com");
@@ -41,6 +43,7 @@ public class ServiceSendMail extends ServiceValidateRequest implements IServiceS
             ex.printStackTrace();
             throw new InternalServerErrorException("Error: " + ex.getMessage());
         }
+        log.info("[Email sent] {} {}", requestSendMail, message);
         return "success";
     }
 
